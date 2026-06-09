@@ -1,14 +1,9 @@
-"use server"
-
-import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function Home() {
-  const users = await prisma.user.findMany();
+  const session = await getServerSession(authOptions);
 
-  return (
-    <div>
-      <h1>Users</h1>
-      <p>{JSON.stringify(users, null, 2)}</p>
-    </div>
-  );
+  if (!session) return <p>Not logged in</p>;
+  return <p>Hello, {session.user?.name}</p>;
 }

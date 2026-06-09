@@ -11,6 +11,15 @@ const globalForPrisma = globalThis as unknown as {
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
+if (
+  process.env.NODE_ENV !== "production" &&
+  (!prisma.account || !prisma.user || !prisma.session)
+) {
+  throw new Error(
+    "Prisma client is missing NextAuth model delegates. Run `npx.cmd prisma generate` and restart `next dev`."
+  );
+}
+
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
