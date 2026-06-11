@@ -39,6 +39,21 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum Role {
+  USER 
+  SELLER 
+  ADMIN
+}
+
+enum SellerStatus {
+  NONE 
+  PENDING 
+  APPROVED 
+  REJECTED
+}
+
+
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -46,8 +61,20 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  role          Role      @default(USER)
+  sellerStatus  SellerStatus  @default(NONE)
+  sellerApplication SellerApplication?
   accounts      Account[]
   sessions      Session[]
+}
+
+model SellerApplication {
+  id        String       @id @default(cuid())
+  userId    String       @unique
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shopName  String
+  phone     String
+  createdAt DateTime     @default(now())
 }
 
 model VerificationToken {
@@ -57,3 +84,4 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
