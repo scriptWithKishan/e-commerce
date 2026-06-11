@@ -9,7 +9,7 @@ export default function Layout ({children}: {children: React.ReactNode}) {
   const path = pathname.includes("login") ? "login" : "register";
 
   return (
-    <div className="min-h-screen bg-[url('/login-background-2.png')] bg-[#FFFDF2] flex flex-col items-center justify-center" >
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#FFFDF2_0%,_#FFF8E8_45%,_#F6EFD0_100%)] flex flex-col items-center justify-center" >
 
       {/* Pill to control the login and register */}
       <div className="relative flex w-50 rounded-full bg-transparent border-black border-1 p-1 mb-2">
