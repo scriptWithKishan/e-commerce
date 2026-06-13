@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import SellerApplyForm from "@/app/(components)/seller-apply-form";
+import SellerApplyForm from "@/app/(protected)/settings/seller/seller-apply-form";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
