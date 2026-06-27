@@ -338,7 +338,7 @@ export default function DashboardPage() {
               Good morning, Kishan! 👋
             </h1>
             <p className="text-slate-500 text-sm mt-1">
-              Here's a breakdown of your business for <span className="font-semibold text-slate-700">June 12, 2026</span>.
+              Heres a breakdown of your business for <span className="font-semibold text-slate-700">June 12, 2026</span>.
             </p>
           </div>
           <div className="flex items-center gap-x-3 self-start md:self-center">
@@ -686,7 +686,7 @@ export default function DashboardPage() {
                   <span>Showing simulated transactions.</span>
                 </span>
                 <span className="font-semibold text-slate-500 italic">
-                  // TODO: Fetch daily transaction rows using Prisma
+                  {/* // TODO: Fetch daily transaction rows using Prisma */}
                 </span>
               </div>
             </div>
@@ -791,7 +791,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-[9px] text-slate-400 italic">
-                  <span>// TODO: Count rows by Order.createdAt</span>
+                  <span>{/* // TODO: Count rows by Order.createdAt */}</span>
                 </div>
               </div>
 
@@ -866,7 +866,9 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-[9px] text-slate-400 italic">
-                  <span>// TODO: Calculate monthly sum percent delta</span>
+                  <span>
+                    {/* // TODO: Calculate monthly sum percent delta */}
+                    </span>
                 </div>
               </div>
 
@@ -950,7 +952,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-[9px] text-slate-400 italic">
-                <span>// TODO: Map Category schema relations to Product entries</span>
+                <span>{/* // TODO: Map Category schema relations to Product entries */}</span>
               </div>
             </div>
 
