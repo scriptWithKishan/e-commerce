@@ -1,11 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { SerializedProductWithCategory } from "@/types/product";
 import { useRouter } from "next/navigation";
 
 interface ProductItemProps {
-  product: SerializedProductWithCategory;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    price: number;
+    salePrice: number | null;
+    stockQty: number;
+    images: Array<{ url: string; altText: string; isPrimary: boolean }>;
+    tags: string[];
+    category: {
+      id: string;
+      name: string;
+      slug: string;
+    } | null;
+  };
 }
 
 export default function ProductItem({ product }: ProductItemProps) {
@@ -24,7 +38,7 @@ export default function ProductItem({ product }: ProductItemProps) {
   return (
     <div
       onClick={() => router.push(`/products/${product.slug}`)}
-      className="group relative flex h-[370px] flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-md"
+      className="group relative flex h-[370px] w-[280px] flex-shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-md"
     >
       {/* Image Container */}
       <div className="relative h-[250px] w-full flex-shrink-0 overflow-hidden bg-slate-50">
@@ -77,11 +91,11 @@ export default function ProductItem({ product }: ProductItemProps) {
         {/* Price */}
         <div className="mt-auto flex items-baseline gap-2 pt-2">
           <span className="text-lg font-bold text-slate-900">
-            {isOnSale ? `$${Number(product.salePrice).toFixed(2)}` : `$${Number(product.price).toFixed(2)}`}
+            {isOnSale ? `₹${Number(product.salePrice).toFixed(2)}` : `₹${Number(product.price).toFixed(2)}`}
           </span>
           {isOnSale && (
             <span className="text-sm text-slate-400 line-through">
-              ${Number(product.price).toFixed(2)}
+              ₹${Number(product.price).toFixed(2)}
             </span>
           )}
         </div>
