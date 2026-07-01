@@ -38,7 +38,7 @@ export default function ProductItem({ product }: ProductItemProps) {
   return (
     <div
       onClick={() => router.push(`/products/${product.slug}`)}
-      className="group relative flex h-[370px] w-[280px] flex-shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-md"
+      className="group relative flex h-[370px] w-full max-w-[330px] mx-auto flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-md"
     >
       {/* Image Container */}
       <div className="relative h-[250px] w-full flex-shrink-0 overflow-hidden bg-slate-50">

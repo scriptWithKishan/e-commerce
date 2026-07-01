@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import ProductItem from "./product-item";
+import { notFound } from "next/navigation";
+import ProductListClient from "./product-list-client";
 
 type ProductImage = {
   url: string;
@@ -25,11 +26,19 @@ type Product = {
 };
 
 interface ProductListProps {
-  limit?: number;
   categorySlug?: string;
+  searchParams?: {
+    sort?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    inStock?: string;
+  };
 }
 
-export default async function ProductList({ limit, categorySlug }: ProductListProps) {
+export default async function ProductList({
+  categorySlug,
+  searchParams,
+}: ProductListProps) {
   // Recursive function to get all nested children
   async function getAllChildren(categoryId: string): Promise<string[]> {
     const children = await prisma.category.findMany({
@@ -46,39 +55,89 @@ export default async function ProductList({ limit, categorySlug }: ProductListPr
     return allIds;
   }
 
-  let whereClause = {};
+  // Build where clause
+  const whereClause: Record<string, unknown> = {};
 
+  // Category filter
   if (categorySlug) {
-    // Get the category
     const selectedCategory = await prisma.category.findUnique({
       where: { slug: categorySlug },
     });
 
     if (selectedCategory) {
-      // Get all nested children (2nd level, 3rd level, etc.)
       const childIds = await getAllChildren(selectedCategory.id);
-
-      // Get all category IDs (selected category + all nested children)
       const categoryIds = [selectedCategory.id, ...childIds];
-
-      whereClause = {
-        categoryId: { in: categoryIds },
-      };
+      whereClause.categoryId = { in: categoryIds };
+    } else {
+      notFound();
     }
   }
 
+  // Stock filter
+  if (searchParams?.inStock === "true") {
+    whereClause.stockQty = { gt: 0 };
+  }
+
+  // Price filter
+  const minPrice = searchParams?.minPrice ? Number(searchParams.minPrice) : undefined;
+  const maxPrice = searchParams?.maxPrice ? Number(searchParams.maxPrice) : undefined;
+
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    whereClause.OR = [
+      { price: {} },
+      { salePrice: {} },
+    ];
+
+    if (minPrice !== undefined) {
+      (whereClause.OR as Record<string, unknown>[])[0].price = { ...((whereClause.OR as Record<string, unknown>[])[0].price as object || {}), gte: minPrice };
+      (whereClause.OR as Record<string, unknown>[])[1].salePrice = { ...((whereClause.OR as Record<string, unknown>[])[1].salePrice as object || {}), gte: minPrice };
+    }
+    if (maxPrice !== undefined) {
+      (whereClause.OR as Record<string, unknown>[])[0].price = { ...((whereClause.OR as Record<string, unknown>[])[0].price as object || {}), lte: maxPrice };
+      (whereClause.OR as Record<string, unknown>[])[1].salePrice = { ...((whereClause.OR as Record<string, unknown>[])[1].salePrice as object || {}), lte: maxPrice };
+    }
+  }
+
+  // Build orderBy
+  let orderBy: Record<string, string> = { createdAt: "desc" };
+
+  switch (searchParams?.sort) {
+    case "price-asc":
+      orderBy = { price: "asc" };
+      break;
+    case "price-desc":
+      orderBy = { price: "desc" };
+      break;
+    case "name-asc":
+      orderBy = { name: "asc" };
+      break;
+    case "name-desc":
+      orderBy = { name: "desc" };
+      break;
+    case "date-asc":
+      orderBy = { createdAt: "asc" };
+      break;
+    case "date-desc":
+    default:
+      orderBy = { createdAt: "desc" };
+      break;
+  }
+
+  // Fetch one extra to check if there are more results
   const products = await prisma.product.findMany({
     where: whereClause,
     include: {
       category: true,
     },
-    take: limit,
-    orderBy: {
-      createdAt: "desc",
-    },
+    take: 9,
+    orderBy,
   });
 
-  const productData: Product[] = products.map((product) => ({
+  // Check if there are more results
+  const hasMore = products.length > 8;
+  const displayProducts = hasMore ? products.slice(0, -1) : products;
+
+  const productData: Product[] = displayProducts.map((product) => ({
     id: product.id,
     name: product.name,
     slug: product.slug,
@@ -91,48 +150,11 @@ export default async function ProductList({ limit, categorySlug }: ProductListPr
     category: product.category,
   }));
 
-
-  if (productData.length === 0) {
-    return (
-      <div className="flex min-h-[400px] w-full flex-col items-center justify-center py-16 text-center">
-        <div className="mb-4 rounded-full bg-slate-100 dark:bg-zinc-800 p-4">
-          <svg
-            className="h-8 w-8 text-slate-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            />
-          </svg>
-        </div>
-        <h3 className="mb-1 text-lg font-semibold text-slate-900 dark:text-zinc-100">
-          No products found
-        </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Check back later for new arrivals.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-10">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {productData.map((product, index) => (
-          <div
-            key={product.id}
-            className="animate-fade-in-up"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <ProductItem product={product} />
-          </div>
-        ))}
-      </div>
-    </div>
+    <ProductListClient
+      initialProducts={productData}
+      hasMore={hasMore}
+      categorySlug={categorySlug}
+    />
   );
 }
