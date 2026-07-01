@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Category } from "@/app/generated/prisma/client";
 import { useLayoutEffect, useRef, useState } from "react";
 import { ChevronLeft } from "lucide-react";
+import { useParams } from "next/navigation";
 
 interface CategoryWithChildren extends Category {
   children?: Category[];
@@ -15,7 +15,6 @@ interface CategoryListProps {
 }
 
 export default function CategoryList({ categories }: CategoryListProps) {
-  const router = useRouter();
   const [visible, setVisible] = useState<CategoryWithChildren[]>(categories);
   const [hidden, setHidden] = useState<CategoryWithChildren[]>([]);
 
@@ -72,19 +71,33 @@ export default function CategoryList({ categories }: CategoryListProps) {
     return () => resizeObserver.disconnect();
   }, [categories]);
 
+  const params = useParams();
+  const activeSlug = params?.slug as string | undefined;
+
+  const isHiddenActive = hidden.some(
+    (cat) => cat.slug === activeSlug || cat.children?.some((c) => c.slug === activeSlug)
+  );
+
   return (
     <div ref={containerRef} className="w-full">
       <ul className="flex items-center gap-4 justify-center flex-wrap w-full relative m-0 p-0 list-none">
         <li className={"block"}>
           <Link
             href={`/`}
-            className="bg-white px-4 py-2 text-black rounded-md shadow-md border border-slate-200 hover:text-white hover:bg-black transition-colors block whitespace-nowrap"
+            className={`px-4 py-2 rounded-md shadow-md border transition-colors block whitespace-nowrap ${
+              !activeSlug
+                ? "bg-black text-white border-black"
+                : "bg-white text-black border-slate-200 hover:text-white hover:bg-black"
+            }`}
           >
             All
           </Link>
         </li>
         {categories.map((category, index) => {
           const isVisible = visible.some((v) => v.id === category.id);
+          const isActive = category.slug === activeSlug || 
+            category.children?.some((c) => c.slug === activeSlug);
+
           return (
             <li
               key={category.id}
@@ -95,21 +108,32 @@ export default function CategoryList({ categories }: CategoryListProps) {
                   itemsRef.current[index] = el;
                 }}
                 href={`/category/${category.slug}`}
-                className="bg-white px-4 py-2 text-black rounded-md shadow-md border border-slate-200 hover:text-white hover:bg-black transition-colors block whitespace-nowrap"
+                className={`px-4 py-2 rounded-md shadow-md border transition-colors block whitespace-nowrap ${
+                  isActive
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-black border-slate-200 hover:text-white hover:bg-black"
+                }`}
               >
                 {category.name}
               </Link>
               {category.children && category.children.length > 0 && (
                 <div className="absolute left-0 top-full mt-1 hidden group-hover:block w-56 rounded-md border border-slate-200 bg-white shadow-lg z-30 py-1 before:absolute before:-top-2 before:left-0 before:w-full before:h-2 before:content-['']">
-                  {category.children.map((child) => (
-                    <Link
-                      key={child.id}
-                      href={`/category/${child.slug}`}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-black hover:text-white transition-colors"
-                    >
-                      {child.name}
-                    </Link>
-                  ))}
+                  {category.children.map((child) => {
+                    const isChildActive = child.slug === activeSlug;
+                    return (
+                      <Link
+                        key={child.id}
+                        href={`/category/${child.slug}`}
+                        className={`block px-4 py-2 text-sm transition-colors ${
+                          isChildActive
+                            ? "bg-black text-white"
+                            : "text-slate-700 hover:bg-black hover:text-white"
+                        }`}
+                      >
+                        {child.name}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </li>
@@ -117,40 +141,70 @@ export default function CategoryList({ categories }: CategoryListProps) {
         })}
         {hidden.length > 0 && (
           <li className="block relative group z-20">
-            <button ref={moreRef} className="bg-white px-4 py-2 text-black rounded-md shadow-md border border-slate-200 hover:text-white hover:bg-black transition-colors block whitespace-nowrap cursor-pointer">
+            <button
+              ref={moreRef}
+              className={`px-4 py-2 rounded-md shadow-md border transition-colors block whitespace-nowrap cursor-pointer ${
+                isHiddenActive
+                  ? "bg-black text-white border-black"
+                  : "bg-white text-black border-slate-200 hover:text-white hover:bg-black"
+              }`}
+            >
               More
             </button>
             <div className="absolute right-0 top-full mt-1 hidden group-hover:block w-45 rounded-md border border-slate-200 bg-white shadow-lg z-30 py-1 before:absolute before:-top-2 before:left-0 before:w-full before:h-2 before:content-['']">
-              {hidden.map((category) => (
-                <div key={category.id} className="relative group/child">
-                  {category.children && category.children.length > 0 ? (
-                    <>
-                      <Link href={`/category/${category.slug}`} className="w-full px-4 py-2 text-sm text-slate-700 hover:bg-black hover:text-white transition-colors flex justify-end items-center gap-2 cursor-pointer">
-                        <span className="text-xs order-1"><ChevronLeft size={14} /></span>
-                        <span className="order-2 flex-1 text-right"> {category.name}</span>
+              {hidden.map((category) => {
+                const isCatActive = category.slug === activeSlug || 
+                  category.children?.some((c) => c.slug === activeSlug);
+
+                return (
+                  <div key={category.id} className="relative group/child">
+                    {category.children && category.children.length > 0 ? (
+                      <>
+                        <Link
+                          href={`/category/${category.slug}`}
+                          className={`w-full px-4 py-2 text-sm transition-colors flex justify-end items-center gap-2 cursor-pointer ${
+                            isCatActive
+                              ? "bg-black text-white"
+                              : "text-slate-700 hover:bg-black hover:text-white"
+                          }`}
+                        >
+                          <span className="text-xs order-1"><ChevronLeft size={14} /></span>
+                          <span className="order-2 flex-1 text-right"> {category.name}</span>
+                        </Link>
+                        <div className="absolute right-full top-0 hidden group-hover/child:block w-48 rounded-md border border-slate-200 bg-white shadow-lg z-40 py-1 -mr-px">
+                          {category.children.map((child) => {
+                            const isChildActive = child.slug === activeSlug;
+                            return (
+                              <Link
+                                key={child.id}
+                                href={`/category/${child.slug}`}
+                                className={`block px-4 py-2 text-sm transition-colors cursor-pointer ${
+                                  isChildActive
+                                    ? "bg-black text-white"
+                                    : "text-slate-700 hover:bg-black hover:text-white"
+                                }`}
+                              >
+                                {child.name}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </>
+                    ) : (
+                      <Link
+                        href={`/category/${category.slug}`}
+                        className={`block px-4 py-2 text-sm text-right transition-colors cursor-pointer ${
+                          isCatActive
+                            ? "bg-black text-white"
+                            : "text-slate-700 hover:bg-black hover:text-white"
+                        }`}
+                      >
+                        {category.name}
                       </Link>
-                      <div className="absolute right-full top-0 hidden group-hover/child:block w-48 rounded-md border border-slate-200 bg-white shadow-lg z-40 py-1 -mr-px">
-                        {category.children.map((child) => (
-                          <Link
-                            key={child.id}
-                            href={`/category/${child.slug}`}
-                            className="block px-4 py-2 text-sm text-slate-700 hover:bg-black hover:text-white transition-colors cursor-pointer"
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <Link
-                      href={`/category/${category.slug}`}
-                      className="block px-4 py-2 text-sm text-right text-slate-700 hover:bg-black hover:text-white transition-colors cursor-pointer"
-                    >
-                      {category.name}
-                    </Link>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </li>
         )}
