@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // GET /api/products - Fetch products with pagination
 export async function GET(req: NextRequest) {
@@ -112,6 +114,15 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "SELLER" || session.user.sellerStatus !== "APPROVED") {
+      return NextResponse.json(
+        { error: "Unauthorized! Only approved sellers can add products." },
+        { status: 401 }
+      );
+    }
+    const sellerId = session.user.id;
+
     const body = await req.json();
     const { name, slug, description, price, salePrice, stockQty, categoryId, tags, images } = body;
 
@@ -141,6 +152,7 @@ export async function POST(req: NextRequest) {
         categoryId: categoryId ?? null,
         tags: tags ?? [],
         images: images ?? [],
+        sellerId,
       }
     })
     return NextResponse.json(

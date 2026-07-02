@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import Image from "next/image";
 import { useState, useCallback, useRef } from "react";
 
 // Types
@@ -464,7 +465,7 @@ export default function AddProductForm({ categories = [] }: AddProductFormProps)
           <div className="grid grid-cols-3 gap-4 mt-4">
             {images.map((img, i) => (
               <div key={img.previewUrl} className="relative rounded-md overflow-hidden border border-gray-300">
-                <img
+                <Image
                   src={img.previewUrl}
                   alt={`Preview ${i + 1}`}
                   className="w-full h-32 object-cover"
