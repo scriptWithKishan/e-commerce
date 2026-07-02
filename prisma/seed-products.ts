@@ -15,41 +15,6 @@ const prisma = new PrismaClient({
 
 const products = [
   {
-    "name": "The Classic Tan Leather Oxford Shoe",
-    "slug": "classic-tan-leather-oxford-shoe",
-    "description": "Step out in style with these timeless tan leather Oxford shoes. Meticulously crafted from high-quality leather, they feature a sleek, professional look that's perfect for work or special occasions. The rich tan color and refined stitching add a touch of sophistication to any outfit. These durable and comfortable oxfords are a staple for every man's wardrobe.",
-    "price": "9232",
-    "salePrice": "8265",
-    "stockQty": 72,
-    "images": [
-      {
-        "url": "https://res.cloudinary.com/dxvpw3wrz/image/upload/v1782896514/e-commerce/ibyexzqcwutyeijdfdw0.png",
-        "altText": "Gemini_Generated_Image_furbdjfurbdjfurb.png",
-        "isPrimary": true
-      },
-      {
-        "url": "https://res.cloudinary.com/dxvpw3wrz/image/upload/v1782896513/e-commerce/sjl0am0tgxp3q858tauk.png",
-        "altText": "Gemini_Generated_Image_r52vv1r52vv1r52v.png",
-        "isPrimary": false
-      },
-      {
-        "url": "https://res.cloudinary.com/dxvpw3wrz/image/upload/v1782896515/e-commerce/dwygyxtinpnqdlq1nt1n.png",
-        "altText": "Gemini_Generated_Image_rbhqpprbhqpprbhq.png",
-        "isPrimary": false
-      }
-    ],
-    "tags": [
-      "men's dress shoes",
-      "oxford shoes",
-      "leather shoes",
-      "tan shoes",
-      "classic style",
-      "professional wear",
-      "men's fashion"
-    ],
-    "categorySlug": "footwear"
-  },
-  {
     "name": "Apex Streak Carbon Full-Face Helmet (Cyan & Orange Edition)",
     "slug": "apex-streak-carbon-full-face-helmet-cyan-orange-edition",
     "description": "Engineered for riders who demand both high-octane style and elite performance, the Apex Streak combines a premium matte carbon-fiber weave texture with striking aerodynamic geometry. Featuring an aggressive, low-profile chin bar and sharp, contrast-blocking racing graphics in vibrant cyan and electric orange, this full-face helmet is optimized for stability at high speeds. Multiple front intake vents ensure maximum airflow through the internal EPS liner, while the scratch-resistant, wide-view visor port offers an uncompromised field of vision on the track or the street.",
@@ -243,8 +208,8 @@ const products = [
     "categorySlug": "laptops"
   },
   {
-    "name": "Nova X1 Pro 5G",
-    "slug": "nova-x1-pro-5g",
+    "name": "Aether Pulse 10, Titanium Body with 100MP camera",
+    "slug": "aether-pulse-10-titanium-body-with-100mp-camera",
     "description": "A sleek, high-performance 5G smartphone featuring a vibrant AMOLED display, advanced AI-powered cameras, long-lasting battery life, and fast charging for seamless everyday use.",
     "price": "83432",
     "salePrice": "73234",

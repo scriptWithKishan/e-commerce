@@ -152,6 +152,7 @@ export default async function ProductList({
 
   return (
     <ProductListClient
+      key={`${categorySlug || ""}_${JSON.stringify(searchParams || {})}`}
       initialProducts={productData}
       hasMore={hasMore}
       categorySlug={categorySlug}

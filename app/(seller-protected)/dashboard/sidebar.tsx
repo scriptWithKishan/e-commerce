@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function DashboardSidebar() {
   return (
-    <div className="w-70 shadow-md py-4">
+    <div className="w-70 flex-shrink-0 shadow-md py-4">
       <h1 className="text-3xl text-black font-extrabold text-center">Seller</h1>
       <ul className="p-2 flex flex-col">
         <li>
@@ -29,7 +29,7 @@ export default function DashboardSidebar() {
         </li>
         <li>
           <Link
-            href="#"
+            href="/dashboard/list-product"
             className="w-full block text-left bg-white font-bold text-black hover:bg-black hover:text-white p-4 cursor-pointer"
           >
             List Products
