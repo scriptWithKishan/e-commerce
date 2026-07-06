@@ -35,6 +35,22 @@ export default function ProductItem({ product }: ProductItemProps) {
 
   const inStock = product.stockQty > 0;
 
+  const addToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    const res = await fetch('/api/cart',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productId: product.id,
+        quantity: 1,
+      }),
+    });
+    
+  }
+
   return (
     <div
       onClick={() => router.push(`/products/${product.slug}`)}
@@ -68,7 +84,10 @@ export default function ProductItem({ product }: ProductItemProps) {
 
         {/* Add to Cart - Slides up on hover */}
         <div className="absolute bottom-0 left-0 right-0 translate-y-full transition-transform duration-300 group-hover:translate-y-0">
-          <button className="w-full bg-slate-900 py-3.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors cursor-pointer">
+          <button 
+            className="w-full bg-slate-900 py-3.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            onClick={addToCart}
+          >
             Add to Cart
           </button>
         </div>
